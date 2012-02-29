@@ -1,0 +1,16 @@
+{
+  "author": "Colin O'Brien <cobrien@rallydev.com>",
+  "name": "rabt",
+  "description": "Rally App Building Toolkit",
+  "version": "0.0.0",
+  "homepage": "https://vmtamgitorious.f4tech.com/rabt/pages/Home",
+  "repository": {
+    "type": "git",
+    "url": "git@vmtamgitorious.f4tech.com:rabt/rabt.git"
+  },
+  "engines": {
+    "node": "~0.6.3"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
