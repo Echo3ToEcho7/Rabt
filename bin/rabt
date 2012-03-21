@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+require('iced-coffee-script');
+
+program
+	.version('0.0.1');
+
+program
+	.command('init')
+	.description('Initialize new Rally App')
+	.option('-c', '--coffeescript', Boolean, 'Sets CoffeeScript as the default language')
+	.action(function() {
+		console.log(program.coffeescript);
+	});
+
+program
+	.command('make <target>')
+	.description('Loads Rappfile to make a build')
+	.option('-e', '--environment', 'Set environment variables', String)
+	.action(function(target) {
+		console.log(program.environment);
+	});
+
+program.parse(process.argv);
