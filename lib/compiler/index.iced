@@ -32,6 +32,6 @@ exports.compileFile = (targetFile, sourceFile, options) ->
 	compiler.setOption k, v for own k, v of options
 	output = compiler.compile contents
 
-	reporter.report sourceFile, (compiler.lint sourceFile, output)
+	(reporter.report sourceFile, (compiler.lint sourceFile, output)) if lint
 
 	fs.writeFileSync targetFile, output, 0, encoding

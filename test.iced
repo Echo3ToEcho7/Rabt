@@ -14,3 +14,8 @@ l = new c.linker.Linker
 j = fs.readFileSync './test/content/app.jade'
 
 fs.writeFileSync './test/content/out.html', (l.link j, content)
+
+d = new c.deploy.Deploy "cobrien@rallydev.com", "Just4Rally", "demo01.rallydev.com"
+await d.createNewPage 729766, 'Test', (l.link j, content), 'myhome', defer oid
+
+console.log "New page create with id #{oid}"
