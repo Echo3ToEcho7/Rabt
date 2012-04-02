@@ -8,7 +8,10 @@
     "type": "git",
     "url": "git://github.com/Echo3ToEcho7/Rabt.git"
   },
-  "main": "lib/index.js",
+  "directories": {
+    "lib": "./lib"
+  },
+  "main": "./lib/index.js",
   "engines": {
     "node": "~0.6.14"
   },
