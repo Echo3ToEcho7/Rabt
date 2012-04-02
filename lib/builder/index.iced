@@ -1,7 +1,7 @@
 _ = require 'underscore'
 browserify = require 'browserify'
 fs = require 'fs'
-eyes = require 'eyes'
+#eyes = require 'eyes'
 
 class Builder
 	constructor: (options) ->
