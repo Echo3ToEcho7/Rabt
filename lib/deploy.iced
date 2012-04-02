@@ -26,7 +26,7 @@ class Deploy
 
 		await request options, defer error, results, body
 		#console.log "Error", error
-		console.log "Results", results
+		#console.log "Results", results
 		#console.log "Body", body
 		
 		await jsdom.env body, defer errors, window
