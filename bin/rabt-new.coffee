@@ -1,6 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 mkdirp = require 'mkdirp'
+exec = require('child_process').exec
 
 opts = require('optimist')
 	.usage('Creates a new Rally App\nUsage: rabt new project_name [options]')
@@ -37,4 +38,56 @@ exports.run = () ->
 	fs.writeFileSync "./#{rootDirName}/src/app.#{ext}", app, 'utf8'
 	fs.writeFileSync "./#{rootDirName}/app.jade", fs.readFileSync(path.join(tplPath, 'app.jade'), 'utf8'), "utf8"
 	
+	cake = """
+	
+		fs = require 'fs'
+		path = require 'path'
+		rabt = require 'rabt'
+
+		option '-p', '--password', 'password to Rally when deploying'
+		option '-u', '--username', 'username to Rally when deploying'
+		option '-s', '--server', 'Rally server to deploy to.  Default: rally1'
+
+		task 'compile', 'compile the app', (options) ->
+			rabt.compiler.compileFile './stage/app.js', './src/app.#{ext}'
+
+		task 'build', 'build the app', (options) ->
+			invoke 'compile'
+
+			b = new rabt.builder.Builder
+
+			content = b.build './stage/app.js'
+			fs.writeFileSync './build/app.js', content
+
+		task 'link', 'link all the files to create the app', (options) ->
+			invoke 'build'
+
+			l = new rabt.linker.Linker
+			j = fs.readFileSync './app.jade'
+			content = fs.readFileSync './build/app.js'
+
+			fs.writeFileSync './app.html', (l.link j, content)
+
+		task 'deploy', 'deploy the app to a new tab', (options) ->
+			invoke 'link'
+
+			content = fs.readFileSync './app.html', 'utf8'
+
+			d = new rabt.deploy.Deploy options.username, options.password, (options.server or 'rally1') + '.rallydev.com'
+
+			if path.existsSync './appdef'
+				oid = fs.readFileSync './appdef', 'utf8'
+				d.updatePage oid, 5857014450, content, (o) ->
+					console.log "Page updated at https://demo01.rallydev.com/#/719828d/custom/" + o
+			else
+				d.createNewPage 5857014450, 'Rabt', content, 'myhome', (oid) ->
+					fs.writeFileSync './appdef', oid
+					console.log "New page at https://demo01.rallydev.com/#/719828d/custom/" + oid
+
+	"""
+	
+	fs.writeFileSync "./#{rootDirName}/Cakefile", cake, 'utf8'
+	
+	npm = exec "cd #{rootDirName} && npm install rabt", (err, stdout, stderr) ->
+		console.log stdout
 	
