@@ -44,11 +44,12 @@ exports.run = () ->
 		path = require 'path'
 		rabt = require 'rabt'
 
-		option '-p', '--password', 'password to Rally when deploying'
-		option '-u', '--username', 'username to Rally when deploying'
-		option '-s', '--server', 'Rally server to deploy to.  Default: rally1'
+		option '-u', '--username [username]', 'username to Rally when deploying'
+		option '-p', '--password [password]', 'password to Rally when deploying'
+		option '-s', '--server [server]', 'Rally server to deploy to.  Default: rally1'
 		
 		projectOid = 0 #FILL ME IN
+		name = #{name}
 
 		task 'compile', 'compile the app', (options) ->
 			rabt.compiler.compileFile './stage/app.js', './src/app.#{ext}'
@@ -74,17 +75,22 @@ exports.run = () ->
 			invoke 'link'
 
 			content = fs.readFileSync './app.html', 'utf8'
-
-			d = new rabt.deploy.Deploy options.username, options.password, (options.server or 'rally1') + '.rallydev.com'
+			server = options.server or 'rally1'
+			
+			unless options.username and options.password
+				console.err 'Please provide a username and password to deploy to Rally'
+				process.exit -1
+			
+			d = new rabt.deploy.Deploy options.username, options.password, server + '.rallydev.com'
 
 			if path.existsSync './appdef.json'
 				oids = require './appdef'
-				d.updatePage oids.dashboard, oids.panel, projectOid, content, (o) ->
-					console.log "Page updated at https://demo01.rallydev.com/#/719828d/custom/" + o
+				d.updatePage oids.dashboard, oids.panel, projectOid, name, content, () ->
+					console.log "Page updated at https://\#{server}.rallydev.com/#/\#{projectOid}d/custom/" + oids.dashboard
 			else
-				d.createNewPage projectOid, 'Rabt', content, 'myhome', (doid, poid) ->
+				d.createNewPage projectOid, name, content, 'myhome', (doid, poid) ->
 					fs.writeFileSync './appdef.json', JSON.stringify {dashboard: doid, panel: poid}
-					console.log "New page at https://demo01.rallydev.com/#/719828d/custom/" + doid
+					console.log "Page updated at https://\#{server}.rallydev.com/#/\#{projectOid}d/custom/" + doid
 
 	"""
 	

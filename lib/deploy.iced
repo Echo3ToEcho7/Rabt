@@ -73,51 +73,29 @@ class Deploy
 		await request options, defer error, results, body
 		
 		options =
-			url: "https://#{@server}/slm/dashbaordSwitchLayout?cpoid=#{cpoid}&layout=SINGLE&dashboardName=#{tab}#{dashboardOid}&_slug=/custom/#{dashboardOid}"
+			url: "https://#{@server}/slm/dashboardSwitchLayout.sp?cpoid=#{cpoid}&layout=SINGLE&dashboardName=#{tab}#{dashboardOid}&_slug=/custom/#{dashboardOid}"
 			method: 'GET'
 
 		await request options, defer error, results, body
 
 		callback(dashboardOid, panelOid)
 
-	updatePage: (oid, cpoid, content, callback) ->
+	updatePage: (doid, poid, cpoid, name, content, callback) ->
 		callback ?= () ->
 		await @_login defer err, res, b
 
-		options = 
-			url: "https://#{@server}/slm/wt/edit.sp?cpoid=#{cpoid}&oid=#{oid}"
-			method: 'GET'
-			followAllRedirects: true
-
-		await request options, defer error, results, body
-
-		await jsdom.env body, defer errors, window
-		#fs.writeFileSync "#{process.cwd()}/_test.html", body
-		version = (window.document.getElementsByName 'version')?[0]?.value
-
-		console.log "Version", version
-
 		options =
-			url: "https://#{@server}/slm/wt/edit/update.sp?cpoid=#{cpoid}&oid=#{oid}"
+			url: "https://#{@server}/slm/dashboard/changepanelsettings.sp?cpoid=#{cpoid}&_slug=/custom/#{doid}"
 			method: 'POST'
 			followAllRedirects: true
 			form:
-				html: content
-				type: 'HTML'
-#				pid: tab or 'myhome'
-				editorMode: 'edit'
-				cpoid: cpoid
-				typechange: false
-				version: parseInt(version, 10)
+				oid: poid
+				dashboardName: "#{tab}#{dashboardOid}"
+				settings: JSON.stringify {title: name, content: content}
+				gestrure: 'changepanelsettings'
 			#jar: @cookieJar
 
-		await request options, defer error, results, body
-		#fs.writeFileSync "#{process.cwd()}/_test2.html", body
-
-		await jsdom.env body, defer errors, window
-		oidElt = window.document.getElementsByName 'oid'
-
-		callback(oidElt?[0]?.value)
+		callback()
 
 	_login: (callback) ->
 		callback ?= () ->
