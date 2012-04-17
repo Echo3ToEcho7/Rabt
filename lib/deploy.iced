@@ -20,6 +20,7 @@ class Deploy
 				name: name
 				#html: content
 				type: 'DASHBOARD'
+				timeboxFilter: 'none'
 				pid: tab
 				editorMode: 'create'
 				cpoid: cpoid
@@ -33,11 +34,26 @@ class Deploy
 		dashboardOid = oidElt?[0]?.value
 
 		options =
+			url: "https://#{@server}/slm/panel/getCatalogPanels.sp?cpoid=#{cpoid}&ignorePanelDefOids&gesture=getcatalogpaneldefs&_slug=/custom/#{dashboardOid}"
+			method: 'GET'
+		
+		await request options, defer error, results, body
+		
+		#fs.writeFileSync "#{process.cwd()}/_test.html", body
+		#console.log "Results", results
+		#console.log "Body", body
+		
+		panels = JSON.parse body
+		
+		for p in panels
+			ptoid = p.oid if p.title is "Custom Panel"
+
+		options =
 			url: "https://#{@server}/slm/dashboard/addpanel.sp?cpoid=#{cpoid}&_slug=/custom/#{dashboardOid}"
 			method: 'POST'
 			followAllRedirects: true
 			form:
-				panelDefinitionOid: '431632107'
+				panelDefinitionOid: ptoid
 				col: 0
 				index: 0
 				dashboardName: "#{tab}#{dashboardOid}"
@@ -50,7 +66,7 @@ class Deploy
 		#fs.writeFileSync "#{process.cwd()}/_test.html", body
 		#console.log "Results", results
 		#console.log "Body", body
-		
+
 		panelOid = JSON.parse(body).oid
 		
 		options =

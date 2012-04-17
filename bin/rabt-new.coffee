@@ -24,7 +24,7 @@ exports.run = () ->
 	tplPath = path.join __dirname, '..', 'lib', 'templates'
 	
 	app = fs.readFileSync path.join(tplPath, language, 'app.txt'), 'utf8'
-	app = app.replace '@@NAME@@', argv.p + '.' + name.replace(' ', '')
+	app = app.replace '@@NAME@@', argv.p + '.' + name.replace(/\ /g, '')
 	rootDirName = name.toLowerCase().replace(/\ /g, '_')
 	ext = switch language
 		when "javascript" then 'js'
