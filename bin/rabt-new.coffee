@@ -25,7 +25,7 @@ exports.run = () ->
 	
 	app = fs.readFileSync path.join(tplPath, language, 'app.txt'), 'utf8'
 	app = app.replace '@@NAME@@', argv.p + '.' + name.replace(' ', '')
-	rootDirName = name.toLowerCase().replace(' ', '_')
+	rootDirName = name.toLowerCase().replace(/\ /g, '_')
 	ext = switch language
 		when "javascript" then 'js'
 		when "coffeescript" then 'coffee'
@@ -65,6 +65,7 @@ exports.run = () ->
 			invoke 'build'
 
 			l = new rabt.linker.Linker
+			l.setOption 'appName', name
 			j = fs.readFileSync './app.jade'
 			content = fs.readFileSync './build/app.js'
 
@@ -93,7 +94,7 @@ exports.run = () ->
 			else
 				d.createNewPage projectOid, name, content, 'myhome', (doid, poid) ->
 					fs.writeFileSync './appdef.json', JSON.stringify {dashboard: doid, panel: poid}
-					console.log "Page updated at https://\#{server}.rallydev.com/#/\#{projectOid}d/custom/" + doid
+					console.log "Page created at https://\#{server}.rallydev.com/#/\#{projectOid}d/custom/" + doid
 
 	"""
 	

@@ -86,10 +86,12 @@ class Deploy
 			followAllRedirects: true
 			form:
 				oid: poid
-				dashboardName: "#{tab}#{dashboardOid}"
+				dashboardName: "#{tab}#{doid}"
 				settings: JSON.stringify {title: name, content: content}
 				gestrure: 'changepanelsettings'
 			#jar: @cookieJar
+
+		await request options, defer error, results, body
 
 		callback()
 
