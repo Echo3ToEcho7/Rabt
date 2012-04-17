@@ -1,5 +1,28 @@
 Rally.createApp('@@NAME@@', {
 	launch: function launch() {
-		console.log("App has been launched...");
+		Rally.data.ModelFactory.getModel({
+			type: 'UserStory',
+			scope: this,
+			success: function(model) {
+				this.grid = this.add({
+					xtype: 'ruigrid',
+					model: model,
+					columnCfgs: [
+						'FormattedID',
+						'Name',
+						'Owner'
+					],
+					storeConfig: {
+						filters: [
+							{
+								property: 'ScheduleState',
+								operator: '=',
+								value: 'Accepted'
+							}
+						]
+					}
+				});
+			}
+		});
 	}
 });
