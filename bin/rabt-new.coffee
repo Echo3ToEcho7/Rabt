@@ -47,6 +47,8 @@ exports.run = () ->
 		option '-p', '--password', 'password to Rally when deploying'
 		option '-u', '--username', 'username to Rally when deploying'
 		option '-s', '--server', 'Rally server to deploy to.  Default: rally1'
+		
+		projectOid = 0 #FILL ME IN
 
 		task 'compile', 'compile the app', (options) ->
 			rabt.compiler.compileFile './stage/app.js', './src/app.#{ext}'
@@ -75,14 +77,14 @@ exports.run = () ->
 
 			d = new rabt.deploy.Deploy options.username, options.password, (options.server or 'rally1') + '.rallydev.com'
 
-			if path.existsSync './appdef'
-				oid = fs.readFileSync './appdef', 'utf8'
-				d.updatePage oid, 5857014450, content, (o) ->
+			if path.existsSync './appdef.json'
+				oids = require './appdef'
+				d.updatePage oids.dashboard, oids.panel, projectOid, content, (o) ->
 					console.log "Page updated at https://demo01.rallydev.com/#/719828d/custom/" + o
 			else
-				d.createNewPage 5857014450, 'Rabt', content, 'myhome', (oid) ->
-					fs.writeFileSync './appdef', oid
-					console.log "New page at https://demo01.rallydev.com/#/719828d/custom/" + oid
+				d.createNewPage projectOid, 'Rabt', content, 'myhome', (doid, poid) ->
+					fs.writeFileSync './appdef.json', JSON.stringify {dashboard: doid, panel: poid}
+					console.log "New page at https://demo01.rallydev.com/#/719828d/custom/" + doid
 
 	"""
 	

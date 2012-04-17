@@ -11,15 +11,16 @@ class Deploy
 		callback ?= () ->
 		await @_login defer err, res, b
 
+		tab ?= 'myhome'
 		options =
 			url: "https://#{@server}/slm/wt/edit/create.sp"
 			method: 'POST'
 			followAllRedirects: true
 			form:
 				name: name
-				html: content
-				type: 'HTML'
-				pid: tab or 'myhome'
+				#html: content
+				type: 'DASHBOARD'
+				pid: tab
 				editorMode: 'create'
 				cpoid: cpoid
 				version: 0
@@ -34,8 +35,50 @@ class Deploy
 		
 		await jsdom.env body, defer errors, window
 		oidElt = window.document.getElementsByName 'oid'
+		dashboardOid = oidElt?[0]?.value
+		
 
-		callback(oidElt?[0]?.value)
+		options =
+			url: "https://#{@server}/slm/dashboard/addpanel.sp?cpoid=#{cpoid}&_slug=/custom/#{dashboardOid}"
+			method: 'POST'
+			followAllRedirects: true
+			form:
+				panelDefinitionOid: '431632107'
+				col: 0
+				index: 0
+				dashboardName: "#{tab}#{dashboardOid}"
+				gestrure: 'addpanel'
+			#jar: @cookieJar
+
+		await request options, defer error, results, body
+		#console.log "Error", error
+
+		#fs.writeFileSync "#{process.cwd()}/_test.html", body
+		#console.log "Results", results
+		#console.log "Body", body
+		
+		panelOid = JSON.parse(body).oid
+		
+		options =
+			url: "https://#{@server}/slm/dashboard/changepanelsettings.sp?cpoid=#{cpoid}&_slug=/custom/#{dashboardOid}"
+			method: 'POST'
+			followAllRedirects: true
+			form:
+				oid: panelOid
+				dashboardName: "#{tab}#{dashboardOid}"
+				settings: JSON.stringify {title: name, content: content}
+				gestrure: 'changepanelsettings'
+			#jar: @cookieJar
+
+		await request options, defer error, results, body
+		
+		options =
+			url: "https://#{@server}/slm/dashbaordSwitchLayout?cpoid=#{cpoid}&layout=SINGLE&dashboardName=#{tab}#{dashboardOid}&_slug=/custom/#{dashboardOid}"
+			method: 'GET'
+
+		await request options, defer error, results, body
+
+		callback(dashboardOid, panelOid)
 
 	updatePage: (oid, cpoid, content, callback) ->
 		callback ?= () ->
