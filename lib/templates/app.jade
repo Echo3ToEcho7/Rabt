@@ -1,7 +1,10 @@
 !!!
 html
 	head
-		title= title
+		title= appName
+		meta(name="Name", content="App: " + appName)
+		meta(name="Version", content=appVersion}
+		meta(name="Vendor", content="Customer"}
 		script(src='/apps/2.0a/sdk.js')
 	body
 		script(lang='javascript')!= app

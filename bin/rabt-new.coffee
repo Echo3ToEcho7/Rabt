@@ -39,7 +39,6 @@ exports.run = () ->
 	fs.writeFileSync "./#{rootDirName}/app.jade", fs.readFileSync(path.join(tplPath, 'app.jade'), 'utf8'), "utf8"
 	
 	cake = """
-	
 		fs = require 'fs'
 		path = require 'path'
 		rabt = require 'rabt'
@@ -49,7 +48,7 @@ exports.run = () ->
 		option '-s', '--server [server]', 'Rally server to deploy to.  Default: rally1'
 		
 		projectOid = 0 #FILL ME IN
-		name = #{name}
+		name = '#{name}'
 
 		task 'compile', 'compile the app', (options) ->
 			rabt.compiler.compileFile './stage/app.js', './src/app.#{ext}'
@@ -78,14 +77,18 @@ exports.run = () ->
 			server = options.server or 'rally1'
 			
 			unless options.username and options.password
-				console.err 'Please provide a username and password to deploy to Rally'
+				console.error 'Please provide a username and password to deploy to Rally'
+				process.exit -1
+				
+			unless projectOid > 0
+				console.error 'Please provide a project oid in the Cakefile to deploy to Rally'
 				process.exit -1
 			
 			d = new rabt.deploy.Deploy options.username, options.password, server + '.rallydev.com'
 
 			if path.existsSync './appdef.json'
 				oids = require './appdef'
-				d.updatePage oids.dashboard, oids.panel, projectOid, name, content, () ->
+				d.updatePage oids.dashboard, oids.panel, projectOid, name, 'myhome', content, () ->
 					console.log "Page updated at https://\#{server}.rallydev.com/#/\#{projectOid}d/custom/" + oids.dashboard
 			else
 				d.createNewPage projectOid, name, content, 'myhome', (doid, poid) ->
@@ -96,6 +99,9 @@ exports.run = () ->
 	
 	fs.writeFileSync "./#{rootDirName}/Cakefile", cake, 'utf8'
 	
+	console.log "Installing NPM dependencies"
 	npm = exec "cd #{rootDirName} && npm install rabt", (err, stdout, stderr) ->
 		console.log stdout
+		console.log "NPM dependencies have been installed"
+		console.log "Your new Rabt project is ready"
 	

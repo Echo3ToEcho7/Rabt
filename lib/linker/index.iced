@@ -18,7 +18,7 @@ class Linker
 
 		locals = {}
 		locals.appName = @_lOptions.appName or "Untiled Rabt App"
-		locals.appSdkVersion = "#{@_lOptions.appSdkVersion}"
+		locals.appSdkVersion = @_lOptions.appSdkVersion
 		locals.appVersion = @_lOptions.appVersion or ("#{(new Date()).getFullYear()}.#{(new Date()).getMonth() + 1}.#{(new Date()).getDate()}")
 		locals.app = "#{compiledJS}"
 

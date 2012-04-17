@@ -27,16 +27,10 @@ class Deploy
 			#jar: @cookieJar
 
 		await request options, defer error, results, body
-		#console.log "Error", error
-
-		#fs.writeFileSync "#{process.cwd()}/_test.html", body
-		#console.log "Results", results
-		#console.log "Body", body
 		
 		await jsdom.env body, defer errors, window
 		oidElt = window.document.getElementsByName 'oid'
 		dashboardOid = oidElt?[0]?.value
-		
 
 		options =
 			url: "https://#{@server}/slm/dashboard/addpanel.sp?cpoid=#{cpoid}&_slug=/custom/#{dashboardOid}"
@@ -80,9 +74,11 @@ class Deploy
 
 		callback(dashboardOid, panelOid)
 
-	updatePage: (doid, poid, cpoid, name, content, callback) ->
+	updatePage: (doid, poid, cpoid, name, tab, content, callback) ->
 		callback ?= () ->
 		await @_login defer err, res, b
+
+		tab ?= 'myhome'
 
 		options =
 			url: "https://#{@server}/slm/dashboard/changepanelsettings.sp?cpoid=#{cpoid}&_slug=/custom/#{doid}"
@@ -109,10 +105,6 @@ class Deploy
 				j_password: @password
 
 		await request options, defer err, res, body
-		#console.log "Error", err
-		#console.log "Results", res
-		#console.log "Body", body
-
 
 		callback.call(err, res, body)
 
