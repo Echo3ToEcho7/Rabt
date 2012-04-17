@@ -1,23 +1,23 @@
 Rally.createApp '@@NAME@@',
 	launch: () ->
-	Rally.data.ModelFactory.getModel
-		type: 'UserStory',
-		scope: @,
-		success: (model) ->
-			@grid = @add
-				xtype: 'ruigrid',
-				model: model,
-				columnCfgs: [
-					'FormattedID',
-					'Name',
-					'Owner'
-				],
-				storeConfig: {
-					filters: [
-						{
-							property: 'ScheduleState',
-							operator: '=',
-							value: 'Accepted'
-						}
-					]
-				}
+		Rally.data.ModelFactory.getModel
+			type: 'UserStory',
+			scope: @,
+			success: (model) ->
+				@grid = @add
+					xtype: 'ruigrid',
+					model: model,
+					columnCfgs: [
+						'FormattedID',
+						'Name',
+						'Owner'
+					],
+					storeConfig: {
+						filters: [
+							{
+								property: 'ScheduleState',
+								operator: '=',
+								value: 'Accepted'
+							}
+						]
+					}

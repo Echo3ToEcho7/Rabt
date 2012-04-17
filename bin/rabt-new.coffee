@@ -19,6 +19,7 @@ exports.run = () ->
 		opts.showHelp()
 		process.exit  0
 	
+	console.log "Creating new Rabt Project..."
 	name = argv._[0]
 	language = argv.l
 	tplPath = path.join __dirname, '..', 'lib', 'templates'
@@ -31,9 +32,12 @@ exports.run = () ->
 		when "coffeescript" then 'coffee'
 		when "icedcoffeescript" then 'iced'
 	
+	console.log "Creating directory structures..."
 	mkdirp.sync "./#{rootDirName}/src"
 	mkdirp.sync "./#{rootDirName}/stage"
 	mkdirp.sync "./#{rootDirName}/build"
+	mkdirp.sync "./#{rootDirName}/cache"
+	mkdirp.sync "./#{rootDirName}/test"
 	
 	fs.writeFileSync "./#{rootDirName}/src/app.#{ext}", app, 'utf8'
 	fs.writeFileSync "./#{rootDirName}/app.jade", fs.readFileSync(path.join(tplPath, 'app.jade'), 'utf8'), "utf8"
@@ -97,12 +101,14 @@ exports.run = () ->
 					console.log "Page created at https://\#{server}.rallydev.com/#/\#{projectOid}d/custom/" + doid
 
 	"""
-	
+	console.log "Creating Cakefile..."
 	fs.writeFileSync "./#{rootDirName}/Cakefile", cake, 'utf8'
 	
-	console.log "Installing NPM dependencies"
+	console.log "Installing NPM dependencies..."
 	npm = exec "cd #{rootDirName} && npm install rabt", (err, stdout, stderr) ->
 		console.log stdout
-		console.log "NPM dependencies have been installed"
-		console.log "Your new Rabt project is ready"
+		console.log "NPM dependencies have been installed."
+		console.log "Your new Rabt project is ready."
+		console.log "Please edit your Cakefile to add the ProjectOID that you will deploy to."
+		
 	
