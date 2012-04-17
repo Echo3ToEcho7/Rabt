@@ -1,0 +1,3 @@
+Rally.createApp '@@NAME@@',
+	launch: () ->
+		console.log "App has been launched..."

@@ -1,0 +1,5 @@
+Rally.createApp('@@NAME@@', {
+	launch: function launch() {
+		console.log("App has been launched...");
+	}
+});
