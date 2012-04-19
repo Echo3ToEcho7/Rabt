@@ -39,7 +39,9 @@ exports.run = () ->
 	mkdirp.sync "./#{rootDirName}/cache"
 	mkdirp.sync "./#{rootDirName}/test"
 	mkdirp.sync "./#{rootDirName}/server"
-	
+
+	fs.writeFileSync "./#{rootDirName}/cache/objects.json", "{}", 'utf8'
+	fs.writeFileSync "./#{rootDirName}/cache/queries.json", "{}", 'utf8'
 	fs.writeFileSync "./#{rootDirName}/src/app.#{ext}", app, 'utf8'
 	fs.writeFileSync "./#{rootDirName}/app.jade", fs.readFileSync(path.join(tplPath, 'app.jade'), 'utf8'), "utf8"
 	
