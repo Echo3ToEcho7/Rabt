@@ -1,12 +1,19 @@
 var argv = require('optimist')
 	.alias('p', 'port')
 	.default('p', 3000)
+	
 	.alias('s', 'server')
 	.default('s', 'demo01')
+	
 	.alias('u', 'username')
-	.default('u', 'paul@acme.com')
+	.default('u', 'dan@acme.com')
+	
 	.alias('w', 'password')
-	.default('w', 'Just4Rally')
+	.default('w', 'AcmeUser')
+	
+	.alias('t', 'enable-testing-mode')
+	.boolean('t')
+
 	.argv;
 
 var fs = require('fs');
@@ -34,11 +41,86 @@ var oidFromRef = function oidFromRef(ref) {
 	return matches[1];
 };
 
-var processRequest = function processRequest(req, res) {
+var processSLMCache = function processSLMCache(req, res) {
+	var qKey = createQueryKey(req);
+	var i;
+	var start = req.query.start || 1;
+	var pagesize = req.query.pagesize || 200;
+	var len;
+	var ret = {
+		Errors: [],
+		Warnings: [],
+		_rallyAPIMajor: "1",
+		_rallyAPIMinor: "31"
+	}
+	var rItems = [];
+	
+	if (!_.include(_.keys(queries), qKey)) {
+		console.log(qKey);
+		console.log(_.keys(queries));
+		ret.Errors.push("Query not found in the test cache");
+		res.json(ret);
+		return;
+	}
+	
+	if (start > queries[qKey].length) {
+		ret.Errors.push("Start is outside the test cache");
+		res.json(ret);
+		return;
+	}
+	
+	len = start + pagesize;
+	if (len > queries[qKey].length) {
+		len = queries[qKey].length - start + 1;
+	}
+	
+	console.log("Start, Len", start, len);
+	for (i = start - 1; i < len; i++) {
+		console.log("Item at ", i, queries[qKey][i]);
+		rItems.push(objects[queries[qKey][i]]);
+	}
+	
+	if (req.route.params[0].indexOf("User") !== -1) {
+		ret.User = rItems[0];
+	} else {
+		ret.Results = rItems;
+		ret.StartIndex = parseInt(""+start, 10);
+		ret.PageSize = parseInt(""+pagesize, 10);
+		ret.TotalResultCount = queries[qKey].length;
+		
+		ret = {QueryResult: ret};
+	}
+	console.log(ret);
+	
+	res.json(ret);
+};
+
+var processAppsCache = function processAppsCache(req, res) {
+	var appPath = cwd + '/cache' + req.route.path.replace('*', '');
+	var splitPath = req.route.params[0].replace('*', '').split('/');
+	for (i=0, ii = splitPath.length - 1; i < ii; i++) {
+		appPath = path.join(appPath, splitPath[i]);
+	}
+	
+	fs.readFile(path.join(appPath, _.last(splitPath)), "utf8", function(err, data) {
+		res.send(data);
+	});
+};
+
+var processRequestWithCache = function processRequestWithCache(req, res) {
+	if (req.route.path === "/slm/*") {
+		processSLMCache(req, res);
+	} else {
+		processAppsCache(req, res);
+	}
+};
+
+var processRequestAndCache = function processRequestAndCache(req, res) {
 	console.log("Requesting " + req.url);
 	//console.log(req);
 	
 	var i, ii;
+	var k;
 	var items;
 	var results;
 	var oid;
@@ -51,43 +133,65 @@ var processRequest = function processRequest(req, res) {
 		}
 	};
 	
-	if (options.method === 'post') {
-	}
-	
 	request(options, function(err, resp, body) {
 		try {
 			items = JSON.parse(body);
 			//console.log(items.QueryResult.Results);
-			results = items.QueryResult.Results;
-			
-			for (i = 0, ii = results.length; i < ii; i++) {
-				oid = oidFromRef(results[i]._ref);
-				if (objects.hasOwnProperty(oid) && objects[oid]) {
-					_.extend(objects[oid], results[i]);
-				} else {
-					objects[oid] = results[i];
+			if (_.include(_.keys(items), 'QueryResult')) {
+				results = items.QueryResult.Results;
+
+				for (i = 0, ii = results.length; i < ii; i++) {
+					oid = oidFromRef(results[i]._ref);
+					if (objects.hasOwnProperty(oid) && objects[oid]) {
+						_.extend(objects[oid], results[i]);
+					} else {
+						objects[oid] = results[i];
+					}
+
+					if (!(_.isArray(queries[createQueryKey(req)]))) {
+						queries[createQueryKey(req)] = []
+					}
+
+					if (!_.include(queries[createQueryKey(req)], oid)) {
+						queries[createQueryKey(req)].push(oid);
+					}
 				}
-				
-				if (!(_.isArray(queries[createQueryKey(req)]))) {
-					queries[createQueryKey(req)] = []
-				}
-				
-				if (!_.include(queries[createQueryKey(req)], oid)) {
-					queries[createQueryKey(req)].push(oid);
+			} else {
+				for (k in items) {
+					if (items.hasOwnProperty(k)) {
+						oid = oidFromRef(items[k]._ref);
+						
+						if (objects.hasOwnProperty(oid) && objects[oid]) {
+							_.extend(objects[oid], items[k]);
+						} else {
+							objects[oid] = items[k];
+						}
+
+						if (!(_.isArray(queries[createQueryKey(req)]))) {
+							queries[createQueryKey(req)] = []
+						}
+
+						if (!_.include(queries[createQueryKey(req)], oid)) {
+							queries[createQueryKey(req)].push(oid);
+						}
+					}
 				}
 			}
 			
-			//console.log("Writing Cache out to file");
+			console.log("Writing Cache out to file");
 			fs.writeFileSync(cwd + "/cache/objects.json", JSON.stringify(objects, null, 4), "utf8");
 			fs.writeFileSync(cwd + "/cache/queries.json", JSON.stringify(queries, null, 4), "utf8");
 		} catch (e) {
+			console.error(e);
 			appPath = cwd + '/cache' + req.route.path.replace('*', '');
 			var splitPath = req.route.params[0].replace('*', '').split('/');
 			for (i=0, ii = splitPath.length - 1; i < ii; i++) {
 				appPath = path.join(appPath, splitPath[i]);
 			}
-			console.log(appPath);
-			console.log(path.join(appPath, _.last(splitPath)));
+			
+			//console.log(appPath);
+			//console.log(path.join(appPath, _.last(splitPath)));
+			
 			mkdirp.sync(appPath);
 			fs.writeFileSync(path.join(appPath, _.last(splitPath)), body, "utf8");
 			//console.log(e);
@@ -97,6 +201,8 @@ var processRequest = function processRequest(req, res) {
 };
 
 exports.run = function run() {
+	var processRequest = argv.t ? processRequestWithCache : processRequestAndCache;
+	
 	app.get('/', function(req, res) {
 		fs.readFile(cwd + '/app.html', 'utf8', function(err, appFile) {
 			res.send(appFile);

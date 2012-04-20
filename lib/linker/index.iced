@@ -26,7 +26,7 @@ class Linker
 		locals.appSdkVersion = @_lOptions.appSdkVersion or '2.0a'
 		locals.appVersion = @_lOptions.appVersion or ("#{(new Date()).getFullYear()}.#{(new Date()).getMonth() + 1}.#{(new Date()).getDate()}")
 		locals.buildType = @_lOptions.buildType or 'release'
-		locals.minify = @_lOptions or false
+		locals.minify = @_lOptions.minify or false
 		
 		if locals.buildType is 'test'
 			locals.app = """
