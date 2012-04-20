@@ -44,8 +44,8 @@ var oidFromRef = function oidFromRef(ref) {
 var processSLMCache = function processSLMCache(req, res) {
 	var qKey = createQueryKey(req);
 	var i;
-	var start = req.query.start || 1;
-	var pagesize = req.query.pagesize || 200;
+	var start = parseInt(req.query.start, 10) || 1;
+	var pagesize = parseInt(req.query.pagesize, 10) || 200;
 	var len;
 	var ret = {
 		Errors: [],
@@ -56,8 +56,8 @@ var processSLMCache = function processSLMCache(req, res) {
 	var rItems = [];
 	
 	if (!_.include(_.keys(queries), qKey)) {
-		console.log(qKey);
-		console.log(_.keys(queries));
+		//console.log(qKey);
+		//console.log(_.keys(queries));
 		ret.Errors.push("Query not found in the test cache");
 		res.json(ret);
 		return;
@@ -70,13 +70,14 @@ var processSLMCache = function processSLMCache(req, res) {
 	}
 	
 	len = start + pagesize;
+	//console.log("First Len", len, pagesize);
 	if (len > queries[qKey].length) {
 		len = queries[qKey].length - start + 1;
 	}
 	
-	console.log("Start, Len", start, len);
+	//console.log("Start, Len", start, len);
 	for (i = start - 1; i < len; i++) {
-		console.log("Item at ", i, queries[qKey][i]);
+		//console.log("Item at ", i, queries[qKey][i]);
 		rItems.push(objects[queries[qKey][i]]);
 	}
 	
@@ -90,7 +91,7 @@ var processSLMCache = function processSLMCache(req, res) {
 		
 		ret = {QueryResult: ret};
 	}
-	console.log(ret);
+	//console.log(ret);
 	
 	res.json(ret);
 };
@@ -102,8 +103,23 @@ var processAppsCache = function processAppsCache(req, res) {
 		appPath = path.join(appPath, splitPath[i]);
 	}
 	
-	fs.readFile(path.join(appPath, _.last(splitPath)), "utf8", function(err, data) {
-		res.send(data);
+	fs.readFile(path.join(appPath, _.last(splitPath)), function(err, data) {
+		var type = "text/html";
+		var page = req.route.params[0];
+		
+		if (page.indexOf('.js') !== -1) {
+			type = "text/javascript";
+		} else if (page.indexOf('.css') !== -1) {
+			type = "text/css";
+		} else if (page.indexOf('.gif') !== -1) {
+			type = "image/gif";
+		}
+		
+		if (err) {
+			res.send(404);
+		} else {
+			res.send(data, { 'Content-Type': type });
+		}
 	});
 };
 
@@ -196,7 +212,9 @@ var processRequestAndCache = function processRequestAndCache(req, res) {
 			fs.writeFileSync(path.join(appPath, _.last(splitPath)), body, "utf8");
 			//console.log(e);
 		}
-		res.send(body);
+		
+//		console.log("Resp", resp);
+		res.send(body, resp.headers);
 	});
 };
 

@@ -2,7 +2,7 @@
   "author": "Colin O'Brien <cobrien@rallydev.com>",
   "name": "rabt",
   "description": "Rally App Building Toolkit",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "homepage": "https://github.com/Echo3ToEcho7/Rabt",
   "repository": {
     "type": "git",
