@@ -1,4 +1,6 @@
-Rally.createApp '@@NAME@@',
+"use strict"
+
+Ext.define '@@NAME@@',
 	launch: () ->
 		Rally.data.ModelFactory.getModel
 			type: 'UserStory',
@@ -21,3 +23,6 @@ Rally.createApp '@@NAME@@',
 							}
 						]
 					}
+
+Rally.launchApp '@@NAME@@',
+	name: '@@TITLE@@'

@@ -1,9 +1,12 @@
-Rally.createApp('@@NAME@@', {
+"use strict";
+/*global Rally, Ext, require*/
+
+Ext.define('@@NAME@@', {
 	launch: function launch() {
 		Rally.data.ModelFactory.getModel({
 			type: 'UserStory',
 			scope: this,
-			success: function(model) {
+			success: function (model) {
 				this.grid = this.add({
 					xtype: 'ruigrid',
 					model: model,
@@ -25,4 +28,8 @@ Rally.createApp('@@NAME@@', {
 			}
 		});
 	}
+});
+
+Rally.launchApp('@@NAME@@', {
+	name: '@@TITLE@@'
 });

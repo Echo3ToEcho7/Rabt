@@ -30,8 +30,8 @@ exports.compileFile = (targetFile, sourceFile, options) ->
 	throw new Error("Unknown extension: #{ext}") unless compiler?
 
 	compiler.setOption k, v for own k, v of options
-	output = compiler.compile contents
+	output = compiler.compile sourceFile, contents
 
-	(reporter.report sourceFile, (compiler.lint sourceFile, output)) if lint
+	#(reporter.report sourceFile, (compiler.lint sourceFile, output)) if lint
 
 	fs.writeFileSync targetFile, output, 0, encoding

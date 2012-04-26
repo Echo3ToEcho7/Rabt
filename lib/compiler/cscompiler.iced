@@ -3,7 +3,7 @@ iced = require 'iced-coffee-script'
 Base = require './base'
 
 class CoffeeCompiler extends Base
-	compile: (sourceContent) ->
+	compile: (name, sourceContent) ->
 		iced.compile sourceContent, @options
 
 CoffeeCompiler.extensions = ['coffee', 'iced']

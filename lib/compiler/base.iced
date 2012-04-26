@@ -14,9 +14,9 @@ class Compiler
 
 	removeOption: (name) -> delete @_cOptions[name]
 
-	compile: (sourceContent) ->
+	compile: (name, sourceContent) ->
 
-	lint: (name, sourceContent) ->
+	lint: (sourceContent) ->
 		lint = linter.lint sourceContent, {}
 		lint
 

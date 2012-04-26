@@ -207,9 +207,17 @@ var processRequestAndCache = function processRequestAndCache(req, res) {
 			
 			//console.log(appPath);
 			//console.log(path.join(appPath, _.last(splitPath)));
+			var enc = "utf8"
+			
+			if (resp.headers['content-type'].indexOf('image/') > 0) {
+				enc = 'binary';
+			}
+			
+			console.log("Encoding", enc, resp.headers['content-type']);
 			
 			mkdirp.sync(appPath);
-			fs.writeFileSync(path.join(appPath, _.last(splitPath)), body, "utf8");
+			//request(options).pipe(fs.createWriteStream(path.join(appPath, _.last(splitPath))));
+			fs.writeFileSync(path.join(appPath, _.last(splitPath)), body, enc);
 			//console.log(e);
 		}
 		
@@ -222,7 +230,7 @@ exports.run = function run() {
 	var processRequest = argv.t ? processRequestWithCache : processRequestAndCache;
 	
 	app.get('/', function(req, res) {
-		fs.readFile(cwd + '/app.html', 'utf8', function(err, appFile) {
+		fs.readFile(cwd + '/bin/app.html', 'utf8', function(err, appFile) {
 			res.send(appFile);
 		});
 	});
