@@ -2,7 +2,7 @@
   "author": "Colin O'Brien <cobrien@rallydev.com>",
   "name": "rabt",
   "description": "Rally App Building Toolkit",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "homepage": "https://github.com/Echo3ToEcho7/Rabt",
   "repository": {
     "type": "git",
@@ -24,8 +24,9 @@
     "request": "~2.9.153",
     "jade": "~0.21.0",
     "optimist": "~0.3.1",
-	"mkdirp": "~0.3.1",
-	"uglify-js": "~1.2.6"
+    "mkdirp": "~0.3.1",
+    "uglify-js": "~1.2.6",
+    "commander": "~0.6.0"
     },
   "devDependencies": {}
 }

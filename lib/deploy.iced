@@ -46,7 +46,7 @@ class Deploy
 		panels = JSON.parse body
 		
 		for p in panels
-			ptoid = p.oid if p.title is "Custom Panel"
+			ptoid = p.oid if p.title is "Custom HTML"
 
 		options =
 			url: "https://#{@server}/slm/dashboard/addpanel.sp?cpoid=#{cpoid}&_slug=/custom/#{dashboardOid}"

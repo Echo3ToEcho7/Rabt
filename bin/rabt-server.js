@@ -1,18 +1,18 @@
 var argv = require('optimist')
-	.alias('p', 'port')
-	.default('p', 3000)
+	.alias('r', 'port')
+	.default('r', 3000)
 	
 	.alias('s', 'server')
-	.default('s', 'demo01')
+	.default('s', 'rally1')
 	
 	.alias('u', 'username')
-	.default('u', 'dan@acme.com')
+	//.default('u', 'dan@acme.com')
 	
-	.alias('w', 'password')
-	.default('w', 'AcmeUser')
+	.alias('p', 'password')
+	//.default('p', 'AcmeUser')
 	
-	.alias('t', 'enable-testing-mode')
-	.boolean('t')
+	.alias('o', 'offline')
+	.boolean('o')
 
 	.argv;
 
@@ -145,7 +145,7 @@ var processRequestAndCache = function processRequestAndCache(req, res) {
 		method: req.route.method,
 		url: rallyServer + req.url,
 		headers: {
-			'Authorization': 'Basic ' + (new Buffer(argv.u + ':' + argv.w)).toString('base64')
+			'Authorization': 'Basic ' + (new Buffer(argv.u + ':' + argv.p)).toString('base64')
 		}
 	};
 	
@@ -209,7 +209,7 @@ var processRequestAndCache = function processRequestAndCache(req, res) {
 			//console.log(path.join(appPath, _.last(splitPath)));
 			var enc = "utf8"
 			
-			if (resp.headers['content-type'].indexOf('image/') > 0) {
+			if (resp.headers['content-type'].indexOf('image/') >= 0) {
 				enc = 'binary';
 			}
 			
@@ -241,6 +241,6 @@ exports.run = function run() {
 	//app.post('/slm/*', processRequest);
 	//app.put ('/slm/*', processRequest);
 	
-	app.listen(argv.p);
-	console.log("Server running on port " + argv.p);
+	app.listen(argv.r);
+	console.log("Server running on port " + argv.r);
 }

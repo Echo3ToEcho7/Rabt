@@ -1,13 +1,15 @@
 "use strict"
 
 Ext.define '@@NAME@@',
+	extend: 'Rally.app.App'
+	
 	launch: () ->
 		Rally.data.ModelFactory.getModel
 			type: 'UserStory',
 			scope: @,
 			success: (model) ->
 				@grid = @add
-					xtype: 'ruigrid',
+					xtype: 'rallygrid',
 					model: model,
 					columnCfgs: [
 						'FormattedID',

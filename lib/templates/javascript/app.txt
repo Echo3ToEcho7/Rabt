@@ -2,13 +2,16 @@
 /*global Rally, Ext, require*/
 
 Ext.define('@@NAME@@', {
+	extend: 'Rally.app.App',
+
 	launch: function launch() {
+
 		Rally.data.ModelFactory.getModel({
 			type: 'UserStory',
 			scope: this,
 			success: function (model) {
 				this.grid = this.add({
-					xtype: 'ruigrid',
+					xtype: 'rallygrid',
 					model: model,
 					columnCfgs: [
 						'FormattedID',

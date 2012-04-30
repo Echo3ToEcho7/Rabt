@@ -8,19 +8,19 @@ opts = require('optimist')
 	.alias('l', 'language')
 	.describe('l', 'Language to use in the App.  Options are javascript, coffeescript, icedcoffeescript')
 	.default('l', 'javascript')
-	.alias('p', 'package')
-	.describe('p', 'Namespace package for your app')
-	.default('p', 'app')
+	.alias('a', 'package')
+	.describe('a', 'Namespace package for your app')
+	.default('a', 'app')
 	
 argv = opts.argv
 
 exports.run = () ->
-	if argv._.length isnt 1
+	if argv._.length isnt 2
 		opts.showHelp()
 		process.exit  0
 	
 	console.log "Creating new Rabt Project..."
-	name = argv._[0]
+	name = argv._[1]
 	language = argv.l
 	tplPath = path.join __dirname, '..', 'lib', 'templates'
 	
@@ -82,7 +82,7 @@ exports.run = () ->
 			fs.writeFileSync './bin/app.html', (b.build j, content)
 
 		task 'deploy', 'deploy the app to a new tab', (options) ->
-			invoke 'link'
+			invoke 'build'
 
 			content = fs.readFileSync './bin/app.html', 'utf8'
 			server = options.server or 'rally1'
