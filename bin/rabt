@@ -7,14 +7,14 @@ require('iced-coffee-script');
 
 cmdr
 	.version(fs.readFileSync(__dirname + '/../lib/VERSION', "utf8"))
-	.option('-u', '--username [username]', '[Server] Specifies the username')
-	.option('-p', '--password [password]', '[Server] Specifies the password')
-	.option('-s', '--server [rally server]', '[Server] Specifies the server to connect to.  Default: rally1')
-	.option('-o', '--offline', '[Server] Sets the server to offline mode.  All queries will return cached values')
-	.option('-r', '--port [port]', '[Server] Specifies the password', parseInt)
+	.option('-u', '--username <username>', 'server: Specifies the username')
+	.option('-p', '--password <password>', 'server: Specifies the password')
+	.option('-s', '--server <server>', 'server: Specifies the server to connect to [rally1]')
+	.option('-o', '--offline', 'server: Sets the server to offline mode.  All queries will return cached values')
+	.option('-r', '--port <port>', 'server: Specifies the port [3000]', Number)
 
-	.option('-a', '--package [package]', '[New] Specifies the app package.  Default: app')
-	.option('-l', '--language [language]', '[New] Specifies the default language for the app.  Default: javascript');
+	.option('-a', '--package <package>', 'new: Specifies the app package [app]')
+	.option('-l', '--language <language>', 'new: Specifies the default language for the app [javascript]');
 
 cmdr
 	.command('new [project]')
