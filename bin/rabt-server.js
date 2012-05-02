@@ -227,7 +227,7 @@ var processRequestAndCache = function processRequestAndCache(req, res) {
 };
 
 exports.run = function run() {
-	var processRequest = argv.t ? processRequestWithCache : processRequestAndCache;
+	var processRequest = argv.o ? processRequestWithCache : processRequestAndCache;
 	
 	app.get('/', function(req, res) {
 		fs.readFile(cwd + '/bin/app.html', 'utf8', function(err, appFile) {
