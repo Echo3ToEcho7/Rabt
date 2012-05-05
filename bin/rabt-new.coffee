@@ -114,7 +114,12 @@ exports.run = () ->
 	npm = exec "cd #{rootDirName} && npm install rabt", (err, stdout, stderr) ->
 		console.log stdout
 		console.log "NPM dependencies have been installed."
+		console.log ""
 		console.log "Your new Rabt project is ready."
-		console.log "Please edit your Cakefile to add the ProjectOID that you will deploy to."
+		console.log "  > project: #{name}"
+		console.log "  >  folder: ./#{rootDirName}"
+		console.log ""
+		console.log "Please edit your Cakefile to set the 'projectOid' that you will deploy to."
+		console.log ""
 		
 	
